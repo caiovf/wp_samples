@@ -27,7 +27,7 @@
         <br>	
         <b>E-mail:</b> $email";
 
-        $enviar = wp_mail(get_field('email','options'),'Newsletter',template_email($mensagem,'Newsletter'),$headers);
+        $enviar = wp_mail('teste@teste.com.br','Newsletter',$mensagem,$headers);
         
         if($enviar){
             echo "Cadastro Realizado";
