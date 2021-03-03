@@ -1,0 +1,64 @@
+// ADICIONAR CONTADOR DE USUÁRIOS NO PAINEL
+	function user_type_count($position){
+		global $pagenow;
+		$query_on_init->query_vars['meta_query'] = '';
+
+		if (is_admin() && 'users.php' == $pagenow) {
+			$terms = get_terms('restrito');
+			$client_role = '';
+			$current_client = $_GET['tipo_de_cliente'];
+
+			if( empty($current_client) ){
+				$class = "class='current'";
+			}
+
+			foreach ($terms as $value) {
+				$name = $value->name;
+				$slug = $value->slug;
+				$id_term = $value->term_id;
+				$current_class = '';
+
+				if( $current_client == $id_term  ){
+					$current_class = "class='current'";
+				}
+				
+				$user_custom_query = new WP_User_Query( array(
+					'meta_query' => array(
+						array(
+							'key' => 'tipo_de_usuario',
+							'value' => $id_term,
+							'compare' => '=='
+						),						
+					)
+				));
+				$user_custom_query_count = $user_custom_query->total_users;
+
+				$client_role .= "<li style='margin: 0 0 0 10px;'><a href='/wp-admin/users.php?tipo_de_cliente=$id_term' $current_class>$name <span class='count'>($user_custom_query_count)</span></a></li>";
+			}
+			$user_count = "<ul class='subsubsub'><li style='position: relative;margin: 0 0 0 10px;'><a $class href='/wp-admin/users.php' >Todos</a></li>$client_role</ul>";
+
+			echo $user_count;
+		}
+	}
+	add_action('restrict_manage_users', 'user_type_count');
+
+	// SETA O FILTRO NO WP USER QUERY
+	function filter_from_link_users($query_on_init){
+		global $pagenow;
+		if (is_admin() && 'users.php' == $pagenow) {
+			$current_client = $_GET['tipo_de_cliente'];
+
+			if( !empty($current_client) ){
+
+				$meta_link_query = array (array (
+					'key' => 'tipo_de_usuario',
+					'value' => $current_client,
+					'compare' => 'LIKE'
+				));
+				$query_on_init['meta_query'] = $meta_link_query;
+			}
+		}
+
+		return $query_on_init;
+	}
+	add_filter( 'users_list_table_query_args' , 'filter_from_link_users' );
