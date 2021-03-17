@@ -1,0 +1,13 @@
+function assign_parent_terms($post_id, $post){
+		if($post->post_type !== 'post_type')
+		return $post_id;
+		
+		$terms = wp_get_post_terms($post_id, 'taxonomy' );
+		foreach($terms as $term){
+			while($term->parent != 0 && !has_term( $term->parent, 'taxonomy', $post )){
+				wp_set_post_terms($post_id, array($term->parent), 'taxonomy', true);
+				$term = get_term($term->parent, 'restrito');
+			}
+		}
+	}
+	add_action('save_post', 'assign_parent_terms', 10, 2);
