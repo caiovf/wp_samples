@@ -1,0 +1,13 @@
+add_filter( 'wp_new_user_notification_email', 'custom_wp_new_user_notification_email', 10, 3 );
+function custom_wp_new_user_notification_email( $wp_new_user_notification_email, $user, $blogname ) {
+
+  $user_login = stripslashes( $user->user_login );
+  $login_url  = home_url('/')."login";
+  $message = "Nome de usuário: $user_login Para definir sua senha, visite o seguinte endereço: $login_url";
+
+  $wp_new_user_notification_email['subject'] = sprintf( 'Novo Usúario', $blogname );
+  $wp_new_user_notification_email['headers'] = array("Content-Type: text/html; charset=UTF-8","From: ".SITE_NAME." <naoresponda@teste.com.br>", "Reply-to: naoresponda@teste.com.br");
+  $wp_new_user_notification_email['message'] = template_email($message,'Novo Usúario');
+
+  return $wp_new_user_notification_email;
+}
