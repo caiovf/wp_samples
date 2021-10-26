@@ -1,3 +1,15 @@
+function my_pre_get_posts($args) {
+		// NOT WORKIN IN PANEL
+		if(is_admin() || !$args->is_main_query())
+			return $args;
+		if(is_archive()) {
+			// POSTS PER PAGE
+			$args->query_vars['posts_per_page'] = 4;
+		}	
+		return $args;
+	}
+	add_action('pre_get_posts', 'my_pre_get_posts');
+
 function base_pagination( $post='' ) {
   if (empty($post)) {
           global $wp_query;
