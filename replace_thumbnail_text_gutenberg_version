@@ -1,0 +1,11 @@
+function change_post_type_labels() {
+	$post_object = get_post_type_object( 'post' );
+
+	if ( ! $post_object ) {
+		return false;
+	}		
+	$post_object->labels->set_featured_image = 'Imagem Destacada: 750x535';		
+	return true;
+}
+	
+add_action( 'wp_loaded', 'change_post_type_labels', 20 );
