@@ -1,34 +1,37 @@
+require_once('../../../../wp-admin/includes/file.php');
+require_once('../../../../wp-admin/includes/image.php');
+
 $attachments = array();
-	if(isset($_FILES['anexo'])){
-		$perm = array(
-			'doc'=>'application/msword',
-			'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-			'pdf'=>'application/pdf',
-			'png'=>'image/png',
-			'jpg'=>'image/jpg'		
-		);
-		$anexo_ar = wp_handle_upload($_FILES['anexo'],array('test_form'=>FALSE, 'mimes'=>$perm));
-		$anexo = '';
-		if($anexo_ar){
-			$anexo = $anexo_ar['url'];
-			$attachments[] = $anexo_ar['file'];
-		}
+if(isset($_FILES['anexo'])){
+	$perm = array(
+		'doc'=>'application/msword',
+		'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'pdf'=>'application/pdf',
+		'png'=>'image/png',
+		'jpg'=>'image/jpg'		
+	);
+	$anexo_ar = wp_handle_upload($_FILES['anexo'],array('test_form'=>FALSE, 'mimes'=>$perm));
+	$anexo = '';
+	if($anexo_ar){
+		$anexo = $anexo_ar['url'];
+		$attachments[] = $anexo_ar['file'];
 	}
+}
 
-	if( !empty($anexo_ar['url']) ){
-		$filetype   = wp_check_filetype(basename($anexo_ar['file']), null);
-		$title      = $_FILES['anexo']['name'];
-		$ext        = strrchr($title, '.');
-		$title      = ($ext !== false) ? substr($title, 0, -strlen($ext)) : $title;
+if( !empty($anexo_ar['url']) ){
+	$filetype   = wp_check_filetype(basename($anexo_ar['file']), null);
+	$title      = $_FILES['anexo']['name'];
+	$ext        = strrchr($title, '.');
+	$title      = ($ext !== false) ? substr($title, 0, -strlen($ext)) : $title;
 
-		$attachment = array(
-			'post_mime_type'    => $filetype['type'],
-			'post_title'        => addslashes($title),
-			'post_content'      => '',
-			'post_status'       => 'inherit'
-		);
+	$attachment = array(
+		'post_mime_type'    => $filetype['type'],
+		'post_title'        => addslashes($title),
+		'post_content'      => '',
+		'post_status'       => 'inherit'
+	);
 
-		$attach_id  = wp_insert_attachment($attachment, $anexo_ar['file']);
-		$attach_data = wp_generate_attachment_metadata($attach_id, $anexo_ar['file']);
-		wp_update_attachment_metadata( $attach_id,  $attach_data );
-	}
+	$attach_id  = wp_insert_attachment($attachment, $anexo_ar['file']);
+	$attach_data = wp_generate_attachment_metadata($attach_id, $anexo_ar['file']);
+	wp_update_attachment_metadata( $attach_id,  $attach_data );
+}
