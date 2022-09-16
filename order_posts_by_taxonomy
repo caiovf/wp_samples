@@ -1,0 +1,27 @@
+function orderby_taxonomy($orderby_statement, $wp_query) {
+	if ( isset( $wp_query->query['orderby'] ) && 'include' == $wp_query->query['orderby'] ) {
+		$term_ids = array();
+								
+		foreach($wp_query->query['include'] as $slug) {
+			$get_term = get_term_by('term_id', $slug, $taxonomy);
+			if($get_term->parent === 0) {
+				if(!in_array($get_term->term_id, $term_ids)) {
+					$term_ids[] = $get_term->term_id;
+				}
+			}
+			else {
+				if(!in_array($get_term->parent, $term_ids)) {
+					$term_ids[] = $get_term->parent;
+					$term_ids[] = $get_term->term_id;
+				}
+				else {
+					$pos = array_search($get_term->parent, $term_ids) + 1;
+					array_splice($term_ids,$pos,0,$get_term->term_id);
+				}
+			}
+		}
+		$result = implode( ',', array_map( 'absint', $term_ids) );
+		$orderby_statement = "FIELD( term_taxonomy_id, $result)";	
+	}
+}
+add_filter( 'posts_orderby', 'orderby_taxonomy', 10, 2 );
