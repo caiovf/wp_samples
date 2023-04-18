@@ -1,0 +1,26 @@
+function order_by_taxonomy( $orderby_statement, $wp_query ) {
+		$order_taxonomy = "";
+		
+		if ( isset( $wp_query->query['orderby'] ) && strpos($wp_query->query['orderby'],'order_taxonomy') !== false ) {
+			$include = explode( " ", $wp_query->query['orderby'] );
+
+			$order_taxonomy .= "(
+				SELECT
+					wp_t.slug 
+					FROM wp_terms wp_t
+					INNER JOIN
+					wp_term_relationships wp_tr ON wp_t.term_id = wp_tr.term_taxonomy_id
+					INNER JOIN
+					wp_posts wp_p ON wp_tr.object_id = wp_p.ID
+					WHERE
+					wp_p.ID = wp_posts.ID
+			) DESC";
+
+			if( count($include) > 1){
+				$order_taxonomy .= ",";
+			}
+		}
+	
+		return $order_taxonomy.$orderby_statement;
+	}
+	add_filter( 'posts_orderby', 'order_by_taxonomy', 10, 2 );
